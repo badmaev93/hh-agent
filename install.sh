@@ -76,6 +76,6 @@ echo "Дальше:"
 echo "  1. set -a; source .env; set +a"
 echo "  2. venv/bin/python scripts/login.py   # залогинься в hh.ru вручную, потом: touch data/done.flag"
 echo "  3. venv/bin/python scripts/fetch_resume.py"
-echo "  4. Открой этот репозиторий в Claude Code — навык hh-job-search в .claude/skills/ подхватится сам."
+echo "  4. В Claude Code: /plugin marketplace add $REPO_ROOT && /plugin install hh-agent@hh-agent"
 echo
 echo "Прочти README.md и docs/RESUME_TIPS.md перед первым запуском."

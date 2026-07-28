@@ -20,7 +20,7 @@
 ## Установка
 
 ```bash
-git clone https://github.com/<your-fork>/hh-agent.git
+git clone https://github.com/badmaev93/hh-agent.git
 cd hh-agent
 ./install.sh
 ```
@@ -31,6 +31,24 @@ cd hh-agent
 3. сохраняет выбор в `.env`;
 4. ставит скилл [ai-copywriter](https://github.com/mikiarlo3/ai-copywriter) (через `npx skills add`, либо см. инструкцию для Claude Code plugin ниже);
 5. создаёт `data/` для резюме/сессии/логов (не коммитится, см. `.gitignore`).
+
+### Подключение к Claude Code как плагин
+
+Скилл `SKILL.md` и субагент `agents/hh-vacancy-scorer.md` лежат в корне репозитория и грузятся как обычный Claude Code plugin (`.claude-plugin/plugin.json`), а не через project-scope `.claude/` — значит, работает независимо от того, откуда ты открыл Claude Code, не обязательно именно из этой папки.
+
+С GitHub (после публикации):
+```
+/plugin marketplace add badmaev93/hh-agent
+/plugin install hh-agent@hh-agent
+```
+
+Локально (пока не запушено, для теста):
+```
+/plugin marketplace add /путь/к/клону/hh-agent
+/plugin install hh-agent@hh-agent
+```
+
+Скрипты (`scripts/`) и данные (`data/`, `venv/`) всё равно работают из того места, куда ты `git clone`-нул репозиторий — команды ниже подразумевают, что ты стоишь в этой папке в терминале.
 
 ### ai-copywriter вручную (если install.sh не смог)
 
@@ -59,7 +77,7 @@ touch data/done.flag
 venv/bin/python scripts/fetch_resume.py
 ```
 
-Дальше открой этот репозиторий в Claude Code и попроси что-то в духе **"найди вакансии на hh.ru"** — навык `.claude/skills/hh-job-search/SKILL.md` подхватится автоматически и проведёт через весь пайплайн: уточнит критерии поиска, спросит регион/удалёнку, покажет топ-50 на подтверждение перед любой реальной отправкой.
+Дальше в Claude Code (после `/plugin install hh-agent@hh-agent`, см. выше) попроси что-то в духе **"найди вакансии на hh.ru"** — скилл `SKILL.md` подхватится и проведёт через весь пайплайн: уточнит критерии поиска, спросит регион/удалёнку, покажет топ-50 на подтверждение перед любой реальной отправкой.
 
 Перед первым прогоном стоит прочитать:
 - `docs/RESUME_TIPS.md` — как заполнить резюме на hh.ru, чтобы скоринг и сопроводительные получались точнее, а не общими словами.
@@ -77,7 +95,7 @@ apply.py                          →  реальные отклики, append �
 extract_screening_questions.py     →  data/questions_extracted.json (только если есть needs_manual)
 ```
 
-Полное описание шагов, селекторов hh.ru и известных граблей — в `.claude/skills/hh-job-search/SKILL.md`.
+Полное описание шагов, селекторов hh.ru и известных граблей — в `SKILL.md`.
 
 ## Риски — прочитай перед использованием
 - Браузерная автоматизация формально нарушает пользовательское соглашение hh.ru. Риск — ограничение аккаунта. Используешь на свой страх и риск.
@@ -90,11 +108,14 @@ extract_screening_questions.py     →  data/questions_extracted.json (толь�
 
 ```
 hh-agent/
+├── .claude-plugin/
+│   ├── plugin.json                     # манифест плагина
+│   └── marketplace.json                # чтобы ставился через /plugin marketplace add
+├── SKILL.md                            # инструкция для Claude Code — весь пайплайн
+├── agents/
+│   └── hh-vacancy-scorer.md            # субагент для скоринга вакансий
 ├── install.sh                          # установка (venv, playwright, браузер, ai-copywriter)
 ├── scripts/                            # весь python-код, без личных данных
-├── .claude/
-│   ├── skills/hh-job-search/SKILL.md   # инструкция для Claude Code — весь пайплайн
-│   └── agents/hh-vacancy-scorer.md     # субагент для скоринга вакансий
 ├── docs/
 │   ├── RESUME_TIPS.md
 │   └── SEARCH_QUERIES.md

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "hh-agent",
+  "description": "Поиск и отклик на вакансии hh.ru через браузерную автоматизацию: многозапросный поиск, скоринг вакансий против резюме субагентами, сопроводительные письма через ai-copywriter, анти-бан лимиты, память откликов между запусками.",
+  "version": "1.0.0",
+  "author": {
+    "name": "badmaev93",
+    "url": "https://github.com/badmaev93"
+  },
+  "homepage": "https://github.com/badmaev93/hh-agent",
+  "repository": "https://github.com/badmaev93/hh-agent",
+  "license": "MIT",
+  "keywords": ["hh.ru", "job-search", "resume", "playwright", "browser-automation", "career"]
+}
