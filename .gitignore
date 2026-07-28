@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Everything personal/runtime lives here: browser_profile (your hh.ru session),
+# resume.txt, vacancies*.json, apply_log.json, shortlist.json, screenshots.
+data/
+__pycache__/
+.DS_Store
