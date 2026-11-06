@@ -57,32 +57,35 @@ def build_search_url(query, area_id=None, remote=False, page=0):
 
 
 def scrape_page(page):
-    cards = page.locator("[data-qa='vacancy-serp__vacancy']")
-    count = cards.count()
-    results = []
-    for i in range(count):
-        card = cards.nth(i)
-        try:
-            title_el = card.locator("a[data-qa='serp-item__title']").first
-            title = title_el.inner_text(timeout=2000)
-            href = title_el.get_attribute("href", timeout=2000)
-        except Exception:
-            continue
-        try:
-            employer = card.locator("[data-qa='vacancy-serp__vacancy-employer']").first.inner_text(timeout=2000)
-        except Exception:
-            employer = ""
-        try:
-            salary = card.locator("[data-qa^='vacancy-serp__vacancy-compensation']").first.inner_text(timeout=2000)
-        except Exception:
-            salary = ""
-        results.append({
-            "title": title,
-            "url": href.split("?")[0] if href else "",
-            "employer": employer,
-            "salary": salary,
-        })
-    return results
+    # ⚡ Bolt Optimization: Replace O(N) network roundtrips with a single browser-context evaluation.
+    # Significantly reduces execution time for large lists.
+    return page.evaluate('''
+        () => {
+            const cards = document.querySelectorAll("[data-qa='vacancy-serp__vacancy']");
+            const results = [];
+            for (const card of cards) {
+                const titleEl = card.querySelector("a[data-qa='serp-item__title']");
+                if (!titleEl) continue;
+
+                const title = titleEl.innerText;
+                const href = titleEl.getAttribute("href");
+
+                const employerEl = card.querySelector("[data-qa='vacancy-serp__vacancy-employer']");
+                const employer = employerEl ? employerEl.innerText : "";
+
+                const salaryEl = card.querySelector("[data-qa^='vacancy-serp__vacancy-compensation']");
+                const salary = salaryEl ? salaryEl.innerText : "";
+
+                results.push({
+                    title: title,
+                    url: href ? href.split("?")[0] : "",
+                    employer: employer,
+                    salary: salary
+                });
+            }
+            return results;
+        }
+    ''')
 
 
 def main():
