@@ -1,0 +1,3 @@
+## 2024-11-06 - Playwright Locator Performance in Loops
+**Learning:** Using Playwright's `locator.nth(i)` in a loop to extract data from a list of elements involves significant overhead because each interaction (e.g., `locator.inner_text()`, `locator.get_attribute()`) creates an O(N) network roundtrip between the Python process and the browser. This can cause severe performance bottlenecks (e.g., ~28s vs ~0.02s) when parsing many elements like search results.
+**Action:** When extracting data from multiple similar elements on a page, use a single `page.evaluate()` block to run the DOM extraction logic entirely in the browser context and return the structured result in one network call.
