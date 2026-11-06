@@ -11,6 +11,7 @@ Usage:
 
 import json
 import os
+import re
 import sys
 import urllib.request
 import urllib.parse
@@ -118,7 +119,8 @@ def main():
             results = scrape_page(page)
             print(f"  найдено на странице: {len(results)}", flush=True)
             if not results:
-                debug_path = os.path.join(hh_common.DATA_DIR, f"debug_search_{query[:20].replace(' ', '_')}.png")
+                safe_query = re.sub(r'[^\w\-]', '_', query[:20])
+                debug_path = os.path.join(hh_common.DATA_DIR, f"debug_search_{safe_query}.png")
                 page.screenshot(path=debug_path)
                 print(f"  0 результатов, скриншот -> {debug_path}")
 
