@@ -99,3 +99,12 @@ def close_clean(context):
     """Close context and mark exit as clean so the NEXT launch doesn't restore tabs."""
     context.close()
     _mark_clean_exit()
+
+def is_safe_url(url):
+    """Prevents SSRF and arbitrary local file access (e.g., file://, javascript:).
+    Playwright can be instructed to navigate anywhere by a malicious user-provided URL."""
+    if not url:
+        return False
+    # Only allow http:// or https://
+    url_lower = str(url).lower().strip()
+    return url_lower.startswith("http://") or url_lower.startswith("https://")

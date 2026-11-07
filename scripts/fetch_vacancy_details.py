@@ -14,6 +14,8 @@ OUT_FILE = os.path.join(hh_common.DATA_DIR, "vacancies_detailed.json")
 
 
 def scrape_vacancy(page, url):
+    if not hh_common.is_safe_url(url):
+        raise ValueError("Invalid URL scheme")
     page.goto(url, wait_until="domcontentloaded", timeout=45000)
     try:
         page.wait_for_selector("[data-qa='vacancy-description']", timeout=15000)

@@ -28,6 +28,10 @@ with sync_playwright() as p:
     context, page = hh_common.launch(p)
 
     for url, employer in TARGETS:
+        if not hh_common.is_safe_url(url):
+            result.append({"url": url, "employer": employer, "title": "", "questions": [], "note": "invalid_url_scheme"})
+            continue
+
         page.goto(url, wait_until="domcontentloaded", timeout=45000)
         page.wait_for_timeout(1500)
         title = page.locator("h1").first.inner_text(timeout=3000)
