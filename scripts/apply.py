@@ -67,6 +67,8 @@ def select_resume(page, resume_name):
 
 
 def apply_to_one(page, item):
+    if not hh_common.is_safe_url(item["url"]):
+        return {"status": "fail", "reason": "invalid_url_scheme"}
     page.goto(item["url"], wait_until="domcontentloaded", timeout=45000)
     page.wait_for_timeout(1500)
 
@@ -152,6 +154,9 @@ def apply_to_one(page, item):
     # applications got silently lost with no way to tell. Reload the vacancy
     # page and check whether the response button is actually gone; hh.ru
     # removes/replaces it once an application is registered.
+    if not hh_common.is_safe_url(item["url"]):
+        return {"status": "success_unconfirmed", "reason": "invalid_url_scheme_for_verify"}
+
     try:
         page.goto(item["url"], wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(1500)
