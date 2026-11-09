@@ -40,6 +40,12 @@ with sync_playwright() as p:
 
     href = resume_links.first.get_attribute("href")
     resume_url = href if href.startswith("http") else f"https://hh.ru{href}"
+
+    if not hh_common.is_safe_url(resume_url):
+        print(f"SECURITY ERROR: URL {resume_url} is not safe. Skipping.")
+        hh_common.close_clean(context)
+        raise SystemExit(1)
+
     print(f"Открываю резюме: {resume_url}", flush=True)
 
     page.goto(resume_url, wait_until="domcontentloaded", timeout=60000)
