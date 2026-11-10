@@ -10,6 +10,7 @@ import json
 import os
 import platform
 import shutil
+import urllib.parse
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
@@ -107,4 +108,15 @@ def is_safe_url(url):
         return False
     # Only allow http:// or https://
     url_lower = str(url).lower().strip()
-    return url_lower.startswith("http://") or url_lower.startswith("https://")
+    if not (url_lower.startswith("http://") or url_lower.startswith("https://")):
+        return False
+
+    # Restrict navigation strictly to hh.ru or its subdomains
+    try:
+        parsed = urllib.parse.urlparse(url_lower)
+        hostname = parsed.hostname
+        if not hostname:
+            return False
+        return hostname == "hh.ru" or hostname.endswith(".hh.ru")
+    except Exception:
+        return False
