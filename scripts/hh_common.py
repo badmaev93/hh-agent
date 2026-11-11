@@ -101,14 +101,36 @@ def close_clean(context):
     context.close()
     _mark_clean_exit()
 
+import re
+
 def is_safe_url(url):
     """Prevents SSRF and arbitrary local file access (e.g., file://, javascript:).
     Playwright can be instructed to navigate anywhere by a malicious user-provided URL."""
     if not url:
         return False
+
+    url_str = str(url).strip()
+
+    # URL decode to catch obfuscated bypasses like %40 (@) or %5C (\)
+    try:
+        decoded_url = urllib.parse.unquote(url_str)
+    except Exception:
+        return False
+
+    # Strip whitespace/control characters that browsers might ignore but Python parses
+    clean_url = re.sub(r'[\x00-\x20\x7f-\xff]', '', decoded_url)
+
+    url_lower = clean_url.lower()
+
     # Only allow http:// or https://
-    url_lower = str(url).lower().strip()
     if not (url_lower.startswith("http://") or url_lower.startswith("https://")):
+        return False
+
+    # Browsers often treat backslash as a forward slash in URLs, which can bypass Python's urlparse
+    url_lower = url_lower.replace("\\", "/")
+
+    # Reject basic auth in URLs which can be used to trick urlparse (e.g., http://evil.com\@hh.ru)
+    if '@' in url_lower:
         return False
 
     # Restrict navigation strictly to hh.ru or its subdomains
